@@ -11,8 +11,16 @@ export default function Login() {
     e.preventDefault();
     try {
       const res = await API.post("/auth/login", { email, password });
+
+      // Save token
       localStorage.setItem("token", res.data.token);
+
+      // Save user with role
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+
+      // Set default auth header
       API.defaults.headers.common["Authorization"] = "Bearer " + res.data.token;
+
       nav("/dashboard");
     } catch (err) {
       alert(err?.response?.data?.message || "Login failed");
