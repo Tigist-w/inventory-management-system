@@ -1,0 +1,42 @@
+.dashboard-container {
+  padding: 20px;
+}
+
+.summary-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.card {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  font-weight: bold;
+  border: 1px solid #ddd;
+}
+
+.card.low {
+  background: #ffe6e6;
+  border-color: #ff5252;
+}
+
+.chart-box {
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.recent-section {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.recent-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+}

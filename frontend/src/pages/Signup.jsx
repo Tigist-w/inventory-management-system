@@ -1,27 +1,35 @@
-// src/pages/Login.jsx
+// src/pages/SignUp.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const Login = () => {
+const SignUp = () => {
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
-    e.preventDefault(); // Prevent page reload (white screen)
+  const handleSignUp = (e) => {
+    e.preventDefault(); // Prevent white screen
 
-    // Fake authentication for demo
-    if (email && password) {
-      navigate("/dashboard"); // Go to dashboard after login
+    if (username && email && password) {
+      alert("Sign up successful!");
+      navigate("/login"); // Redirect to login
     } else {
-      alert("Please enter email and password");
+      alert("Please fill all fields");
     }
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">Login</h1>
-      <form onSubmit={handleLogin} className="flex flex-col gap-3 w-80">
+      <h1 className="text-2xl font-bold mb-4">Sign Up</h1>
+      <form onSubmit={handleSignUp} className="flex flex-col gap-3 w-80">
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="border px-3 py-2 rounded"
+        />
         <input
           type="email"
           placeholder="Email"
@@ -38,22 +46,22 @@ const Login = () => {
         />
         <button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="bg-green-500 text-white px-4 py-2 rounded"
         >
-          Login
+          Sign Up
         </button>
       </form>
       <p className="mt-4">
-        Don't have an account?{" "}
+        Already have an account?{" "}
         <span
-          onClick={() => navigate("/signup")}
+          onClick={() => navigate("/")}
           className="text-blue-500 cursor-pointer"
         >
-          Sign Up
+          Login
         </span>
       </p>
     </div>
   );
 };
 
-export default Login;
+export default SignUp;

@@ -1,76 +1,86 @@
 import React, { useState, useEffect } from "react";
 import API from "../services/api";
-import ProductModal from "../components/ProductModal";
+import SupplierModal from "../components/SupplierModal";
 import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
 import Pagination from "../components/Pagination";
 
-const Products = ({ searchTerm }) => {
-  const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
+const Suppliers = ({ searchTerm }) => {
+  const [suppliers, setSuppliers] = useState([]);
+  const [filteredSuppliers, setFilteredSuppliers] = useState([]);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
   // Modal states
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [productToDelete, setProductToDelete] = useState(null);
+  const [supplierToDelete, setSupplierToDelete] = useState(null);
 
-  // Fetch products
-  const fetchProducts = async () => {
+  // ✅ Fetch suppliers (fixed correct API path)
+  const fetchSuppliers = async () => {
     try {
-      const res = await API.get("/products");
-      setProducts(res.data);
-      setFilteredProducts(res.data);
+      const res = await API.get("/suppliers");
+      setSuppliers(res.data);
+      setFilteredSuppliers(res.data);
     } catch (err) {
-      console.error("Fetch products error:", err);
+      console.error("Fetch suppliers error:", err);
     }
   };
 
   useEffect(() => {
-    fetchProducts();
+    fetchSuppliers();
   }, []);
 
-  // Search filter
+  // ✅ Search Filter (safe version)
   useEffect(() => {
     if (!searchTerm) {
-      setFilteredProducts(products);
+      setFilteredSuppliers(suppliers);
       return;
     }
+
     const search = searchTerm.toLowerCase();
-    const filtered = products.filter(
-      (p) =>
-        p.name?.toLowerCase().includes(search) ||
-        p.category?.toLowerCase().includes(search)
-    );
-    setFilteredProducts(filtered);
+
+    const filtered = suppliers.filter((s) => {
+      const name = s?.name?.toLowerCase() || "";
+      const company = s?.companyName?.toLowerCase() || "";
+      const phone = s?.phone?.toLowerCase() || "";
+      return (
+        name.includes(search) ||
+        company.includes(search) ||
+        phone.includes(search)
+      );
+    });
+
+    setFilteredSuppliers(filtered);
     setCurrentPage(1);
-  }, [searchTerm, products]);
+  }, [searchTerm, suppliers]);
 
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
-  const currentProducts = filteredProducts.slice(indexOfFirst, indexOfLast);
+  const currentSuppliers = filteredSuppliers.slice(indexOfFirst, indexOfLast);
 
   // Button handlers
   const handleAdd = () => {
-    setSelectedProduct(null);
+    setSelectedSupplier(null);
     setModalOpen(true);
   };
 
-  const handleEdit = (product) => {
-    setSelectedProduct(product);
+  const handleEdit = (supplier) => {
+    setSelectedSupplier(supplier);
     setModalOpen(true);
   };
 
-  const handleDeleteClick = (product) => {
-    setProductToDelete(product);
+  const handleDeleteClick = (supplier) => {
+    setSupplierToDelete(supplier);
     setDeleteModalOpen(true);
   };
 
+  // ✅ Delete (fixed API route)
   const handleDeleteConfirm = async () => {
     try {
-      await API.delete(`/products/${productToDelete._id}`);
-      fetchProducts();
+      await API.delete(`/suppliers/${supplierToDelete._id}`);
+      fetchSuppliers();
       setDeleteModalOpen(false);
     } catch (err) {
       console.error("Delete error:", err);
@@ -79,78 +89,61 @@ const Products = ({ searchTerm }) => {
 
   return (
     <div className="mt-4">
+      {/* Page Header */}
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-3xl font-bold text-gray-700">Products</h2>
+        <h2 className="text-3xl font-bold text-gray-700">Suppliers</h2>
         <button
           onClick={handleAdd}
           className="px-5 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition"
         >
-          + Add Product
+          + Add Supplier
         </button>
       </div>
 
+      {/* Suppliers Table */}
       <div className="overflow-x-auto bg-white rounded-lg shadow-lg">
         <table className="min-w-full divide-y divide-gray-300">
           <thead className="bg-gray-100">
             <tr>
               <th className="px-6 py-3 text-left font-medium text-gray-600 uppercase tracking-wider">
-                Image
-              </th>
-              <th className="px-6 py-3 text-left font-medium text-gray-600 uppercase tracking-wider">
                 Name
               </th>
               <th className="px-6 py-3 text-left font-medium text-gray-600 uppercase tracking-wider">
-                Category
+                Company
               </th>
               <th className="px-6 py-3 text-left font-medium text-gray-600 uppercase tracking-wider">
-                Stock
+                Phone
               </th>
               <th className="px-6 py-3 text-left font-medium text-gray-600 uppercase tracking-wider">
-                Price
+                Email
               </th>
               <th className="px-6 py-3 text-left font-medium text-gray-600 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
+
           <tbody className="bg-white divide-y divide-gray-200">
-            {currentProducts.map((product) => (
-              <tr
-                key={product._id}
-                className={
-                  product.stock <= 5
-                    ? "bg-red-50 hover:bg-red-100 transition"
-                    : "hover:bg-gray-50 transition"
-                }
-              >
-                <td className="px-6 py-3">
-                  <img
-                    src={product.image || "https://via.placeholder.com/50"}
-                    alt={product.name}
-                    className="h-12 w-12 rounded-md shadow"
-                  />
-                </td>
+            {currentSuppliers.map((supplier) => (
+              <tr key={supplier._id} className="hover:bg-gray-50 transition">
                 <td className="px-6 py-3 font-medium text-gray-800">
-                  {product.name}
+                  {supplier.name}
                 </td>
-                <td className="px-6 py-3 text-gray-700">{product.category}</td>
-                <td className="px-6 py-3 font-bold">
-                  {product.stock <= 5 ? (
-                    <span className="text-red-600">{product.stock}</span>
-                  ) : (
-                    <span className="text-gray-800">{product.stock}</span>
-                  )}
+                <td className="px-6 py-3 text-gray-700">
+                  {supplier.companyName}
                 </td>
-                <td className="px-6 py-3 text-gray-700">${product.price}</td>
-                <td className="px-6 py-3 flex gap-3 flex-wrap">
+                <td className="px-6 py-3 text-gray-700">{supplier.phone}</td>
+                <td className="px-6 py-3 text-gray-700">{supplier.email}</td>
+
+                <td className="px-6 py-3 flex gap-3">
                   <button
-                    onClick={() => handleEdit(product)}
+                    onClick={() => handleEdit(supplier)}
                     className="px-4 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
                   >
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDeleteClick(product)}
+                    onClick={() => handleDeleteClick(supplier)}
                     className="px-4 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
                   >
                     Delete
@@ -158,32 +151,46 @@ const Products = ({ searchTerm }) => {
                 </td>
               </tr>
             ))}
+
+            {/* If no data */}
+            {currentSuppliers.length === 0 && (
+              <tr>
+                <td
+                  colSpan="5"
+                  className="text-center py-6 text-gray-500 font-medium"
+                >
+                  No suppliers found
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
 
+      {/* Pagination */}
       <Pagination
-        totalItems={filteredProducts.length}
+        totalItems={filteredSuppliers.length}
         itemsPerPage={itemsPerPage}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
       />
 
-      <ProductModal
+      {/* Modals */}
+      <SupplierModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        onSave={fetchProducts}
-        product={selectedProduct}
+        onSave={fetchSuppliers}
+        supplier={selectedSupplier}
       />
 
       <DeleteConfirmationModal
         isOpen={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={handleDeleteConfirm}
-        itemName={productToDelete?.name}
+        itemName={supplierToDelete?.name}
       />
     </div>
   );
 };
 
-export default Products;
+export default Suppliers;
