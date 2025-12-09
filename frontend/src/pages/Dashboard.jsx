@@ -90,7 +90,7 @@ const Dashboard = () => {
           <Card
             title="Total Products"
             value={summary.totalProducts}
-            color="yellow"
+            color="green"
           />
           <Card title="Low Stock" value={summary.lowStock} color="red" />
         </div>
